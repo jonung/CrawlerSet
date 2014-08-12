@@ -10,6 +10,6 @@ public class IndustryCrawlerOne implements Crawler{
 
     @Override
     public void process() {
-
+        System.out.println("Test");
     }
 }
