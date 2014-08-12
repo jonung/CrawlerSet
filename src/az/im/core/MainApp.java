@@ -1,6 +1,6 @@
 package az.im.core;
 
-import az.im.core.crawlers.CrawlerOne;
+import az.im.core.crawlers.IndustryCrawlerOne;
 
 /**
  * Created by Qianhz on 14-8-12.
@@ -9,6 +9,6 @@ import az.im.core.crawlers.CrawlerOne;
 public class MainApp {
 
     public static void main(String[] args) {
-        new CrawlerOne().process();
+        new IndustryCrawlerOne().process();
     }
 }

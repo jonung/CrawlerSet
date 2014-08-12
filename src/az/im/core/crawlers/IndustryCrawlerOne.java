@@ -4,13 +4,12 @@ import az.im.core.Crawler;
 
 /**
  * Created by Qianhz on 14-8-12.
- *
+ * 爬虫
  */
-
-public class CrawlerOne implements Crawler {
+public class IndustryCrawlerOne implements Crawler{
 
     @Override
     public void process() {
-        System.out.println("Hello World");
+
     }
 }
