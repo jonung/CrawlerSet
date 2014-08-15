@@ -26,7 +26,7 @@ public class IndustryCrawlerOne implements Crawler{
     private PreparedStatement prestmtIndustry = null;
     private PreparedStatement prestmtProduct = null;
 
-    private static int cnt = 1;
+    private int cnt = 1;
     private String no = "";
 
     @Override
@@ -38,8 +38,9 @@ public class IndustryCrawlerOne implements Crawler{
 
         while(true) {
 
-            parseURL(url + cnt, cnt);
-            cnt++;
+                System.out.println(Thread.currentThread().getName() + " is parsing " + cnt);
+                parseURL(url + cnt, cnt);
+                cnt++;
 
             if(cnt == 10000000) {
                 System.out.println("Finished~");
