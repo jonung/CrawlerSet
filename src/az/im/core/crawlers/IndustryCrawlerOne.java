@@ -38,7 +38,7 @@ public class IndustryCrawlerOne implements Crawler{
 
         while(true) {
 
-            parseURL(url + cnt);
+            parseURL(url + cnt, cnt);
             cnt++;
 
             if(cnt == 10000000) {
@@ -52,16 +52,16 @@ public class IndustryCrawlerOne implements Crawler{
      * 解析网页
      * @param industryURL
      */
-    private void parseURL(String industryURL) {
+    private void parseURL(String industryURL, int count) {
 
-        System.out.println("开始解析第 " + cnt + " 条企业信息");
+        System.out.println("开始解析第 " + count + " 条企业信息");
 
         Document doc = null;
 
         try {
             doc = Jsoup.connect(industryURL).get();
         } catch (IOException e) {
-            System.out.println("解析第 " + cnt + " 条企业信息失败");
+            System.out.println("解析第 " + count + " 条企业信息失败");
             return;
         }
 
@@ -81,10 +81,10 @@ public class IndustryCrawlerOne implements Crawler{
         Element product  = getProductInfo(elements);
         Elements links = product.select("a");
         for(int i = 0; i < links.size(); i++) {
-            parseProductURL("http://app2.sfda.gov.cn/" + links.get(i).attr("href"), i + 1);
+            parseProductURL("http://app2.sfda.gov.cn/" + links.get(i).attr("href"), count);
         }
 
-        System.out.println("解析第 " + cnt + " 条企业信息成功");
+        System.out.println("解析第 " + count + " 条企业信息成功");
 
     }
 
@@ -128,7 +128,7 @@ public class IndustryCrawlerOne implements Crawler{
         }
             prestmtIndustry.execute();
         } catch (Exception exception) {
-            System.out.println("*** 插入失败 ***");
+            exception.printStackTrace();
             return false;
         }
         return true;
@@ -136,43 +136,43 @@ public class IndustryCrawlerOne implements Crawler{
 
     private void parseProductURL(String productURL, int count) {
 
-        System.out.println("    开始解析第 " + count + " 条产品信息");
+        //System.out.println("    开始解析第 " + count + " 条产品信息");
         Document doc = null;
 
         try {
             doc = Jsoup.connect(productURL).get();
         } catch (IOException e) {
-            System.out.println("解析第 " + count + " 条产品信息失败");
+            //System.out.println("解析第 " + count + " 条产品信息失败");
             return;
         }
 
         Elements elements = doc.select("body > center > table:nth-child(19) > tbody > tr > td > table:nth-child(2) > tbody > tr > td > table");
 
-        if(!insertProductInfo(elements)){
-            System.out.println("    插入产品信息失败");
+        if(!insertProductInfo(elements, count)){
+            //System.out.println("    插入产品信息失败");
             return;
         }
 
-        System.out.println("    解析第 " + count + " 条产品信息成功");
+        //System.out.println("    解析第 " + count + " 条产品信息成功");
     }
 
     /**
      * 产品信息入库
      * @param e
      */
-    private boolean insertProductInfo(Elements e) {
+    private boolean insertProductInfo(Elements e, int count) {
 
         Elements ele = e.select("td");
 
         try {
-            prestmtProduct.setString(1, no);
+            prestmtProduct.setString(1, "" + count);
             for(int i = 0; i < ele.size() - 1; i++) {
                 prestmtProduct.setString(i + 2, ele.get(i).text());
                 //System.out.println(ele.get(i).text());
             }
             prestmtProduct.execute();
         } catch (Exception exception) {
-            System.out.println("    *** 插入失败 ***");
+            exception.printStackTrace();
             return false;
         }
         return true;
