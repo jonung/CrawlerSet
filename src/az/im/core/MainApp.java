@@ -12,6 +12,7 @@ public class MainApp {
 
         final Crawler crawler = new IndustryCrawlerOne();
 
+
         Thread thread1 = new Thread() {
             @Override
             public void run() {

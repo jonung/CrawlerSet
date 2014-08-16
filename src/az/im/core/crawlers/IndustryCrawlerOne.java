@@ -20,13 +20,13 @@ import java.sql.PreparedStatement;
 public class IndustryCrawlerOne implements Crawler{
 
     private String url = "http://app2.sfda.gov.cn/datasearchp/index1.do?tableId=25&tableName=TABLE25&company=company&tableView=%B9%FA%B2%FA%D2%A9%C6%B7&Id=";
-    private String industrySQL = "insert into industry(id, type, province, industry_name, industry_legal_person, industry_principal, industry_type, industry_address, production_address, product_scope, certificate_date, expiration_date, comment) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private String industrySQL = "insert into industry(no, id, type, province, industry_name, industry_legal_person, industry_principal, industry_type, industry_address, production_address, product_scope, certificate_date, expiration_date, comment) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     private String productSQL = "insert into product(no, approval_number, product_name, english_name, commodity_name, dosage_form, specification, production_industry, production_address, product_type, original_approval_number, approval_date, drug_standard_code, drug_standard_code_comment) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private PreparedStatement prestmtIndustry = null;
     private PreparedStatement prestmtProduct = null;
 
-    private int cnt = 1;
+    private static int cnt = 0;
     private String no = "";
 
     @Override
@@ -38,43 +38,42 @@ public class IndustryCrawlerOne implements Crawler{
 
         while(true) {
 
-                System.out.println(Thread.currentThread().getName() + " is parsing " + cnt);
-                parseURL(url + cnt, cnt);
-                cnt++;
+                int ccnt = getCount();
+                System.out.println(Thread.currentThread().getName() + " is parsing " + ccnt);
+                parseURL(url + ccnt, ccnt);
 
-            if(cnt == 10000000) {
+            if(ccnt == 10000000) {
                 System.out.println("Finished~");
                 break;
             }
         }
     }
 
+    private synchronized static int getCount() {
+        return ++cnt;
+    }
     /**
      * 解析网页
      * @param industryURL
      */
     private void parseURL(String industryURL, int count) {
-
-        System.out.println("开始解析第 " + count + " 条企业信息");
-
         Document doc = null;
 
         try {
             doc = Jsoup.connect(industryURL).get();
         } catch (IOException e) {
-            System.out.println("解析第 " + count + " 条企业信息失败");
+            System.out.println(Thread.currentThread().getName() + " parsing " + count + " failed");
             return;
         }
 
         Elements elements = doc.select("body > center > table:nth-child(19) > tbody > tr > td > table:nth-child(3) > tbody > tr > td > table");
 
         if(elements.isEmpty() || elements.text().indexOf("编号") == -1) {
-            System.out.println("企业信息不存在");
+            System.out.println(Thread.currentThread().getName() + " parsing " + count + " failed");
             return;
         }
 
-        if(!insertIndustryInfo(getIndustryInfo(elements))){
-            System.out.println("插入企业信息失败");
+        if(!insertIndustryInfo(getIndustryInfo(elements), count)){
             return;
         }
 
@@ -85,7 +84,7 @@ public class IndustryCrawlerOne implements Crawler{
             parseProductURL("http://app2.sfda.gov.cn/" + links.get(i).attr("href"), count);
         }
 
-        System.out.println("解析第 " + count + " 条企业信息成功");
+        System.out.println(Thread.currentThread().getName() + " parsing " + count + " succeed");
 
     }
 
@@ -118,14 +117,15 @@ public class IndustryCrawlerOne implements Crawler{
      * 企业信息入库
      * @param e
      */
-    private boolean insertIndustryInfo(Element e) {
+    private boolean insertIndustryInfo(Element e, int count) {
         Elements ele = e.select("td");
 
         no = ele.get(0).text();
 
         try {
+            prestmtIndustry.setString(1, "" + count);
         for(int i = 0; i < ele.size(); i++) {
-                prestmtIndustry.setString(i + 1, ele.get(i).text());
+                prestmtIndustry.setString(i + 2, ele.get(i).text());
         }
             prestmtIndustry.execute();
         } catch (Exception exception) {
