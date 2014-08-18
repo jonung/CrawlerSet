@@ -62,7 +62,7 @@ public class IndustryCrawlerOne implements Crawler{
         try {
             doc = Jsoup.connect(industryURL).get();
         } catch (IOException e) {
-            System.out.println(Thread.currentThread().getName() + " parsing " + count + " failed");
+            System.out.println(Thread.currentThread().getName() + " parse " + count + " failed");
             return;
         }
 
@@ -84,7 +84,7 @@ public class IndustryCrawlerOne implements Crawler{
             parseProductURL("http://app2.sfda.gov.cn/" + links.get(i).attr("href"), count);
         }
 
-        System.out.println(Thread.currentThread().getName() + " parsing " + count + " succeed");
+        System.out.println(Thread.currentThread().getName() + " parse " + count + " succeed");
 
     }
 
@@ -129,7 +129,8 @@ public class IndustryCrawlerOne implements Crawler{
         }
             prestmtIndustry.execute();
         } catch (Exception exception) {
-            exception.printStackTrace();
+//            exception.printStackTrace();
+            System.out.println(Thread.currentThread().getName() + " insert " + count + " failed");
             return false;
         }
         return true;
@@ -174,6 +175,7 @@ public class IndustryCrawlerOne implements Crawler{
             prestmtProduct.execute();
         } catch (Exception exception) {
             exception.printStackTrace();
+            System.out.println(Thread.currentThread().getName() + " insert " + count + " failed");
             return false;
         }
         return true;
