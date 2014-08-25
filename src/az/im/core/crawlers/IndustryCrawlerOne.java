@@ -42,8 +42,8 @@ public class IndustryCrawlerOne implements Crawler{
                 System.out.println(Thread.currentThread().getName() + " is parsing " + ccnt);
                 parseURL(url + ccnt, ccnt);
 
-            if(ccnt == 10000000) {
-                System.out.println("Finished~");
+            if(ccnt >= 10000000) {
+                System.out.println("!!!");
                 break;
             }
         }
@@ -129,7 +129,7 @@ public class IndustryCrawlerOne implements Crawler{
         }
             prestmtIndustry.execute();
         } catch (Exception exception) {
-//            exception.printStackTrace();
+            //exception.printStackTrace();
             System.out.println(Thread.currentThread().getName() + " insert " + count + " failed");
             return false;
         }
