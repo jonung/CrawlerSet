@@ -6,5 +6,5 @@ package az.im.core;
  */
 public interface Crawler {
 
-    void process();
+    public void process();
 }

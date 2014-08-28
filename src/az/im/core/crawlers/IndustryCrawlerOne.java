@@ -33,8 +33,8 @@ public class IndustryCrawlerOne implements Crawler{
     public void process() {
 
         /* 初始化 */
-        prestmtIndustry = MySQLUtils.getPreparedStatement("jdbc:mysql://localhost/cfda", "root", "admin", industrySQL);
-        prestmtProduct = MySQLUtils.getPreparedStatement("jdbc:mysql://localhost/cfda", "root", "admin", productSQL);
+        prestmtIndustry = MySQLUtils.getPreparedStatement("jdbc:mysql://localhost/cfda", "1root", "admin", industrySQL);
+        prestmtProduct = MySQLUtils.getPreparedStatement("jdbc:mysql://localhost/cfda", "1root", "admin", productSQL);
 
         while(true) {
 
