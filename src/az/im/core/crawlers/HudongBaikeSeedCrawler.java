@@ -44,7 +44,6 @@ public class HudongBaikeSeedCrawler implements Crawler {
             remainWordStack.push(e.text().trim());
         }
 
-        int count = 1;
         String word = null;
         String url = null;
         while(!remainWordStack.isEmpty()) {
@@ -66,7 +65,7 @@ public class HudongBaikeSeedCrawler implements Crawler {
             }
 
             // 解析URL
-            System.out.println("Parsing " + count++ + " : " + url);
+            System.out.println("Remaining " + remainWordStack.size() + " words" + " | Parsing "  + url);
 
             while(times == 1) {
             try {
