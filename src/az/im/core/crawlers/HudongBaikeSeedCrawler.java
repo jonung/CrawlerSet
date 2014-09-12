@@ -27,8 +27,8 @@ public class HudongBaikeSeedCrawler implements Crawler {
     public void process() {
 
         // 数据库初始化
-        PreparedStatement insertClassTreePstmt = MySQLUtils.getPreparedStatement("jdbc:mysql://localhost/hudong_baike", "root", "admin", insertClassTree);
-        PreparedStatement insertClassPstmt = MySQLUtils.getPreparedStatement("jdbc:mysql://localhost/hudong_baike", "root", "admin", insertClass);
+        PreparedStatement insertClassTreePstmt = MySQLUtils.getPreparedStatement("jdbc:mysql://10.15.62.235/hudong_baike", "root", "admin", insertClassTree);
+        PreparedStatement insertClassPstmt = MySQLUtils.getPreparedStatement("jdbc:mysql://10.15.62.235/hudong_baike", "root", "admin", insertClass);
 
 
         Document doc = null;
