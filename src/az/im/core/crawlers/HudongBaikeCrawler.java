@@ -80,7 +80,7 @@ public class HudongBaikeCrawler implements Crawler {
             // 为了防止解析失败， 最多进行5次
             int tag2 = 1;
 
-            while (tag2 < 5) {
+            while (tag2 < 10) {
 
                 if(tag2 != 1) {
                     try {
@@ -96,12 +96,12 @@ public class HudongBaikeCrawler implements Crawler {
                     doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36").referrer("http://www.baike.com/").timeout(10000).get();
                     // 取到后置位
                     if (doc != null) {
-                        tag2 = 5;
+                        tag2 = 10;
                     }
                 } catch (Exception e) {
                     tag2++;
                     // 如果重试失败，则进行下一轮循环
-                    if(tag2 == 5) {
+                    if(tag2 == 10) {
                         break;
                     }
                 }
@@ -131,7 +131,7 @@ public class HudongBaikeCrawler implements Crawler {
                 Document targetDoc = null;
                 Elements targetEle = null;
 
-                while (time < 5) {
+                while (time < 10) {
 
                     if(time != 0) {
                         try {
@@ -162,13 +162,13 @@ public class HudongBaikeCrawler implements Crawler {
 
                         // 如果全部操作完成，则可以退出
                         if (targetDoc != null) {
-                            time = 5;
+                            time = 10;
                         }
                     } catch (Exception e) {
                         //e.printStackTrace();
                         ++time;
                         // 如果重试失败，则进行下一轮循环
-                        if(time == 5) {
+                        if(time == 10) {
                             break;
                         }
                     }
