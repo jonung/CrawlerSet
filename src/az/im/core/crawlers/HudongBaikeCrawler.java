@@ -20,9 +20,6 @@ public class HudongBaikeCrawler implements Crawler {
     private String insertSQL = "insert into baike_pages(class, title, label, content) values(?, ?, ?, ?)";
     private String querySQL = "select class from baike_class where rec_id = ?";
 
-    private String del1 = "飞信 0";
-    private String del2 = "互动百科的词条（含所附图片）系由网友上传，如果涉嫌侵权，请与客服联系，我们将按照法律之相关规定及时进行处理。";
-
     // 上限为 34737
     private static int cnt = 0;
 
@@ -31,6 +28,7 @@ public class HudongBaikeCrawler implements Crawler {
 
         PreparedStatement prestmtInsert = null;
         PreparedStatement prestmtQuery = null;
+
         doCrawler(prestmtInsert, prestmtQuery);
     }
 
@@ -42,7 +40,7 @@ public class HudongBaikeCrawler implements Crawler {
 
         int count = 0;
 
-        while (count <= 34737) {
+        while (count <= 10) {
 
             // 获取全局 rec_id
             count = getCount();
@@ -53,23 +51,24 @@ public class HudongBaikeCrawler implements Crawler {
             ResultSet rs = null;
             String key = null;
 
+
+            // 这个key是必定可以取到的!
             boolean tag1 = true;
             while (tag1) {
                 try {
                     pstmtQ.setInt(1, count);
                     rs = pstmtQ.executeQuery();
-
                     while (rs.next()) {
                         key = rs.getString(1);
                     }
                     tag1 = false;
                 } catch (Exception e) {
-                    System.out.println("Get key failed, try again!");
                 }
             }
 
             System.out.println(Thread.currentThread().getName() + " starts to parse " + count + " : " + key);
 
+            // 构造list
             String url = "http://fenlei.baike.com/" + key + "/list/";
 
             Document doc = null;
@@ -77,21 +76,45 @@ public class HudongBaikeCrawler implements Crawler {
 
             List<String> list = new ArrayList<String>();
 
-            int tag2 = 0;
-            while (tag2 < 10) {
+
+            // 为了防止解析失败， 最多进行5次
+            int tag2 = 1;
+
+            while (tag2 < 5) {
+
+                if(tag2 != 1) {
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                System.out.println(Thread.currentThread().getName() + " try to get [" + key + "] lists. try " + tag2 + " times");
 
                 try {
-                    doc = Jsoup.connect(url).get();
+                    doc = Jsoup.connect(url).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36").referrer("http://www.baike.com/").timeout(10000).get();
+                    // 取到后置位
                     if (doc != null) {
-                        tag2 = 10;
+                        tag2 = 5;
                     }
                 } catch (Exception e) {
+                    tag2++;
+                    // 如果重试失败，则进行下一轮循环
+                    if(tag2 == 5) {
+                        break;
+                    }
                 }
             }
 
-            eles = doc.select("dl > dd > a");
+            if(doc == null ) {
+                continue;
+            }
+
+            eles = doc.select("dl>dd>a");
 
             if (eles == null) {
+                // 如果获取元素为空，则进行下一轮循环
                 continue;
             }
 
@@ -107,10 +130,21 @@ public class HudongBaikeCrawler implements Crawler {
 
                 Document targetDoc = null;
                 Elements targetEle = null;
-                while (time < 10) {
+
+                while (time < 5) {
+
+                    if(time != 0) {
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     System.out.println(Thread.currentThread().getName() + " is parsing : " + key + " : " + str);
+
                     try {
-                        targetDoc = Jsoup.connect(targetURL).get();
+                        targetDoc = Jsoup.connect(targetURL).userAgent("Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36").referrer("http://www.baike.com/").timeout(10000).get();
+                        Thread.sleep(100);
 
                         targetEle = targetDoc.select("div.l.w-640");
                         String content = targetEle.text();
@@ -126,10 +160,17 @@ public class HudongBaikeCrawler implements Crawler {
                         pstmtI.setString(4, content);
                         pstmtI.execute();
 
+                        // 如果全部操作完成，则可以退出
                         if (targetDoc != null) {
-                            time = 10;
+                            time = 5;
                         }
                     } catch (Exception e) {
+                        //e.printStackTrace();
+                        ++time;
+                        // 如果重试失败，则进行下一轮循环
+                        if(time == 5) {
+                            break;
+                        }
                     }
                 }
             }
