@@ -11,9 +11,9 @@ public class MainApp {
     public static void main(String[] args) {
         //new HudongBaikeSeedCrawler().process();
 
-        System.setProperty("proxySet", "true");
-        System.setProperty("http.proxyHost", "10.15.62.235");
-        System.setProperty("http.proxyPort", "808");
+        /*System.setProperty("proxySet", "true");
+        System.setProperty("http.proxyHost", "10.15.62.238");
+        System.setProperty("http.proxyPort", "808");*/
 
         final Crawler crawler = new HudongBaikeCrawler();
 
@@ -45,42 +45,13 @@ public class MainApp {
             }
         };
 
-        Thread thread5 = new Thread() {
-            @Override
-            public void run() {
-                crawler.process();
-            }
-        };
 
-        Thread thread6 = new Thread() {
-            @Override
-            public void run() {
-                crawler.process();
-            }
-        };
-
-        Thread thread7 = new Thread() {
-            @Override
-            public void run() {
-                crawler.process();
-            }
-        };
-
-        Thread thread8 = new Thread() {
-            @Override
-            public void run() {
-                crawler.process();
-            }
-        };
 
         thread1.start();
         thread2.start();
         thread3.start();
         thread4.start();
-        //thread5.start();
-        //thread6.start();
-        //thread7.start();
-        //thread8.start();
+
 
     }
 }

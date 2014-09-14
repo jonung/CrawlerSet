@@ -19,6 +19,7 @@ public class HudongBaikeCrawler implements Crawler {
 
     private String insertSQL = "insert into baike_pages(class, title, label, content) values(?, ?, ?, ?)";
     private String querySQL = "select class from baike_class where rec_id = ?";
+    private String updateSQL = "update baike_class set tag = ? where rec_id = ?";
 
     // 上限为 34737
     private static int cnt = 0;
@@ -28,19 +29,21 @@ public class HudongBaikeCrawler implements Crawler {
 
         PreparedStatement prestmtInsert = null;
         PreparedStatement prestmtQuery = null;
+        PreparedStatement prestmtUpdate = null;
 
-        doCrawler(prestmtInsert, prestmtQuery);
+        doCrawler(prestmtInsert, prestmtQuery, prestmtUpdate);
     }
 
-    private void doCrawler(PreparedStatement pstmtI, PreparedStatement pstmtQ) {
+    private void doCrawler(PreparedStatement pstmtI, PreparedStatement pstmtQ, PreparedStatement pstmtU) {
 
         // 初始化
         pstmtI = MySQLUtils.getPreparedStatement("jdbc:mysql://10.15.62.235/hudong_baike", "root", "admin", insertSQL);
         pstmtQ = MySQLUtils.getPreparedStatement("jdbc:mysql://10.15.62.235/hudong_baike", "root", "admin", querySQL);
+        pstmtU = MySQLUtils.getPreparedStatement("jdbc:mysql://10.15.62.235/hudong_baike", "root", "admin", updateSQL);
 
         int count = 0;
 
-        while (count <= 10) {
+        while (count <= 34737) {
 
             // 获取全局 rec_id
             count = getCount();
@@ -77,7 +80,7 @@ public class HudongBaikeCrawler implements Crawler {
             List<String> list = new ArrayList<String>();
 
 
-            // 为了防止解析失败， 最多进行5次
+            // 为了防止解析失败， 最多进行10次
             int tag2 = 1;
 
             while (tag2 < 10) {
@@ -86,7 +89,6 @@ public class HudongBaikeCrawler implements Crawler {
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
 
@@ -173,6 +175,16 @@ public class HudongBaikeCrawler implements Crawler {
                         }
                     }
                 }
+
+            }
+
+            // 置位
+            try{
+                pstmtU.setInt(1, 1);
+                pstmtU.setInt(2, count);
+                pstmtU.execute();
+            }catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
