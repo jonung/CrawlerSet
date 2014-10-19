@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -121,7 +123,17 @@ public class HudongBaikeCrawler implements Crawler {
             }
 
             for (Element e : eles) {
-                list.add(e.text().trim());
+                String w = e.attr("href");
+                if("javascript:void(0);".equals(w)) {
+                     w = e.text().trim();
+                } else {
+                w = w.substring(w.lastIndexOf('/') + 1, w.length());
+                try {
+                    w = URLDecoder.decode(w, "UTF-8").trim();
+                } catch (UnsupportedEncodingException e1) {
+                }
+                }
+                list.add(w);
             }
 
             // 开始抓取
@@ -184,7 +196,6 @@ public class HudongBaikeCrawler implements Crawler {
                 pstmtU.setInt(2, count);
                 pstmtU.execute();
             }catch (Exception e) {
-                e.printStackTrace();
             }
         }
     }
