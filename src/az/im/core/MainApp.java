@@ -1,6 +1,7 @@
 package az.im.core;
 
 import az.im.core.crawlers.HudongBaikeCrawler;
+import az.im.core.crawlers.TCMKDCrawler;
 
 /**
  * Created by Qianhz on 14-8-12.
@@ -15,7 +16,7 @@ public class MainApp {
         System.setProperty("http.proxyHost", "10.15.62.238");
         System.setProperty("http.proxyPort", "808");*/
 
-        final Crawler crawler = new HudongBaikeCrawler();
+        final Crawler crawler = new TCMKDCrawler();
 
         Thread thread1 = new Thread() {
             @Override
@@ -51,7 +52,5 @@ public class MainApp {
         thread2.start();
         thread3.start();
         thread4.start();
-
-
     }
 }
