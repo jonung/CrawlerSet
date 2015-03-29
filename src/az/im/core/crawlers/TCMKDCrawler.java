@@ -33,7 +33,7 @@ public class TCMKDCrawler implements Crawler {
             parseURL(ccnt);
 
             if(ccnt >= 9999) {
-                break;
+                return;
             }
         }
     }
@@ -64,13 +64,12 @@ public class TCMKDCrawler implements Crawler {
         }
         String name = title.substring(0, index).trim();
         String type = title.substring(index + 1, title.indexOf(")")).trim();
+        buffer = new StringBuffer();
         try {
-            if (type.equals("疾病")) {
-                type = "jb";
-            } else if (type.equals("中药")) {
-                type = "zy";
-                buffer = new StringBuffer();
-                buffer.append("编号:" + cnt).append("\r\n");
+                String types = nameSwitch(type);
+            if(types.equals("ops")){
+                return;
+            }
                 buffer.append("名称:" + name).append("\r\n");
                 buffer.append("简介:" + detail).append("\r\n");
                 Elements ele = basicDoc.select("#title tr");
@@ -103,11 +102,13 @@ public class TCMKDCrawler implements Crawler {
                         String key = e.select(".panel-heading > h3").get(0).text().trim();
                         if(key.equals("被分析")) {
                             Elements eles = e.select("tbody tr");
-                            values += eles.html();
+                            for(Element eee : eles) {
+                                values += eee.text() + "\r\n";
+                            }
                         }else {
                             Elements eles = e.select("ul > li > a");
                             for(Element es : eles) {
-                                values += es.text().trim() + " ";
+                                values += es.text().trim() + "\r\n";
                             }
                         }
                         String from = e.select(".panel-footer").get(0).text().trim();
@@ -115,26 +116,16 @@ public class TCMKDCrawler implements Crawler {
                     }
 
                 }
-                writer = new BufferedWriter(new FileWriter(new File("./resources/tcmkd/" + type + "/" + cnt + "-" + name + ".txt")));
+                writer = new BufferedWriter(new FileWriter(new File("./resources/tcmkd/" + types + "/" + cnt + "-" + name + ".txt")));
                 writer.write(buffer.toString());
                 writer.close();
 
                 try {
-                    Thread.sleep(1000 * 30);
+                    Thread.sleep(1000 * 3);
                 }catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (type.equals("方剂")) {
-                type = "fj";
-            } else if (type.equals("药理作用")) {
-                type = "ylzy";
-            } else if (type.equals("中药化学成分")) {
-                type = "zyhxcf";
-            } else if (type.equals("化学实验方法")) {
-                type = "hxsyff";
-            } else {
-                type = "!!!!!!!!!!!!!!!!!!!!!!";
-            }
+
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -144,5 +135,24 @@ public class TCMKDCrawler implements Crawler {
 
     private synchronized static int getCount() {
         return ++cnt;
+    }
+
+    private static String nameSwitch(String str) {
+        if(str.equals("疾病")){
+            return "jb";
+        }else if(str.equals("中药")){
+            return "zy";
+        }else if(str.equals("方剂")){
+            return "fj";
+        }else if(str.equals("药理作用")){
+            return "ylzy";
+        }else if(str.equals("中药化学成分")){
+            return "zyhxcf";
+        }else if(str.equals("化学实验方法")){
+            return "hxsyff";
+        }else {
+            System.out.println("OVER");
+            return "ops";
+        }
     }
 }
