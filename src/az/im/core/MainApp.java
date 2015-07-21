@@ -1,8 +1,5 @@
 package az.im.core;
 
-import az.im.core.crawlers.HudongBaikeCrawler;
-import az.im.core.crawlers.IFengAskCrawler;
-import az.im.core.crawlers.TCMKDCrawler;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -18,6 +15,13 @@ public class MainApp {
 
     public static void main(String[] args) throws IOException {
 
-        new TCMKDCrawler().process();
+        for(int i = 1; i <= 46; i++) {
+            Document document = Jsoup.connect("http://www.importnew.com/all-posts/page/" + i).get();
+            Elements ele = document.select(".post.floated-thumb > .post-meta > p > .meta-title");
+            System.out.println(ele.html());
+            for(Element e : ele) {
+                System.out.println(e.text());
+            }
+        }
     }
 }
